@@ -1,18 +1,33 @@
-import React from 'react';
-import { Lock, Play } from 'lucide-react';
+import React, { useState } from 'react';
+import { Lock, Play, Bookmark } from 'lucide-react';
 import { Course } from '../types';
+import { Link } from 'react-router-dom';
+import { toggleBookmark } from '../data/courses';
 
 interface CourseCardProps {
   course: Course;
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
-  const { title, description, thumbnail, status, progress } = course;
+  const { id, title, description, thumbnail, status, progress } = course;
+  const [isBookmarked, setIsBookmarked] = useState(course.bookmarked || false);
+  const [isHovered, setIsHovered] = useState(false);
   
   const isLocked = status === 'locked';
   
+  const handleBookmarkToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleBookmark(id);
+    setIsBookmarked(!isBookmarked);
+  };
+  
   return (
-    <div className={`card w-full bg-base-100 shadow-xl overflow-hidden h-full ${isLocked ? 'grayscale opacity-80' : ''}`}>
+    <div 
+      className={`card w-full bg-base-100 shadow-xl overflow-hidden h-full ${isLocked ? 'grayscale opacity-80' : ''}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <figure className="relative h-48">
         <img 
           src={thumbnail} 
@@ -24,10 +39,27 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
             <Lock size={20} className="text-error" />
           </div>
         )}
+        
+        {/* Bookmark button - visible on hover */}
+        {!isLocked && isHovered && (
+          <button 
+            className={`absolute top-2 right-2 btn btn-sm ${isBookmarked ? 'btn-primary' : 'btn-ghost bg-base-100/80'} btn-circle`}
+            onClick={handleBookmarkToggle}
+          >
+            <Bookmark size={16} className={isBookmarked ? 'fill-current' : ''} />
+          </button>
+        )}
+        
+        {/* Always show bookmark indicator if bookmarked */}
+        {!isLocked && isBookmarked && !isHovered && (
+          <div className="absolute top-2 right-2 bg-primary p-2 rounded-full shadow-md">
+            <Bookmark size={16} className="fill-current text-primary-content" />
+          </div>
+        )}
       </figure>
       
       <div className="card-body">
-        <h2 className="card-title">{title}</h2>
+        <Link to={`/course/${id}`} className="card-title hover:text-primary transition-colors">{title}</Link>
         <p className="text-sm text-base-content/70">{description}</p>
         
         {!isLocked && progress !== undefined && (
@@ -50,10 +82,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
               Enable this Course
             </button>
           ) : (
-            <button className="btn btn-primary btn-sm">
+            <Link to={`/course/${id}`} className="btn btn-primary btn-sm">
               {progress && progress > 0 ? 'Continue' : 'Start Learning'}
               <Play size={16} />
-            </button>
+            </Link>
           )}
         </div>
       </div>
