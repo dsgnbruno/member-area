@@ -1,82 +1,63 @@
-import React from 'react';
-import { HelpCircle, Search, MessageCircle, FileText, ExternalLink } from 'lucide-react';
+import React, { useState } from 'react';
+import { HelpCircle, CheckCircle, Send } from 'lucide-react';
 
 const HelpPage: React.FC = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [formError, setFormError] = useState('');
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Simple validation
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      setFormError('Please fill in all fields');
+      return;
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setFormError('Please enter a valid email address');
+      return;
+    }
+    
+    // Clear any previous errors
+    setFormError('');
+    
+    // In a real app, you would send the form data to a server here
+    console.log('Form submitted:', formData);
+    
+    // Show success message
+    setFormSubmitted(true);
+    
+    // Reset form
+    setFormData({
+      name: '',
+      email: '',
+      subject: '',
+      message: ''
+    });
+  };
+
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex items-center gap-3 mb-8">
         <HelpCircle size={24} className="text-primary" />
         <h1 className="text-2xl font-bold">Help Center</h1>
-      </div>
-      
-      {/* Search Bar */}
-      <div className="bg-base-100 rounded-box p-6 shadow-lg mb-8">
-        <div className="form-control">
-          <div className="input-group">
-            <input 
-              type="text" 
-              placeholder="Search for help topics..." 
-              className="input input-bordered w-full" 
-            />
-            <button className="btn btn-primary">
-              <Search size={20} />
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      {/* Help Categories */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div className="card bg-base-100 shadow-lg">
-          <div className="card-body">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="bg-primary/10 p-3 rounded-full">
-                <FileText size={24} className="text-primary" />
-              </div>
-              <h2 className="card-title">Documentation</h2>
-            </div>
-            <p className="text-base-content/70">
-              Browse our comprehensive guides and tutorials
-            </p>
-            <div className="card-actions justify-end mt-4">
-              <button className="btn btn-primary btn-sm">View Docs</button>
-            </div>
-          </div>
-        </div>
-        
-        <div className="card bg-base-100 shadow-lg">
-          <div className="card-body">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="bg-secondary/10 p-3 rounded-full">
-                <MessageCircle size={24} className="text-secondary" />
-              </div>
-              <h2 className="card-title">Contact Support</h2>
-            </div>
-            <p className="text-base-content/70">
-              Get in touch with our support team
-            </p>
-            <div className="card-actions justify-end mt-4">
-              <button className="btn btn-secondary btn-sm">Contact Us</button>
-            </div>
-          </div>
-        </div>
-        
-        <div className="card bg-base-100 shadow-lg">
-          <div className="card-body">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="bg-accent/10 p-3 rounded-full">
-                <ExternalLink size={24} className="text-accent" />
-              </div>
-              <h2 className="card-title">Community</h2>
-            </div>
-            <p className="text-base-content/70">
-              Join our community forum for discussions
-            </p>
-            <div className="card-actions justify-end mt-4">
-              <button className="btn btn-accent btn-sm">Visit Forum</button>
-            </div>
-          </div>
-        </div>
       </div>
       
       {/* FAQs */}
@@ -136,48 +117,107 @@ const HelpPage: React.FC = () => {
         </div>
       </div>
       
-      {/* Contact Form */}
+      {/* Redesigned Contact Form */}
       <div className="bg-base-100 rounded-box p-6 shadow-lg">
-        <h2 className="text-xl font-bold mb-6">Still Need Help?</h2>
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <Send size={20} className="text-primary" />
+          Still Need Help?
+        </h2>
         
-        <form className="space-y-4">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Your Name</span>
-            </label>
-            <input type="text" placeholder="Enter your name" className="input input-bordered w-full" />
+        {formSubmitted ? (
+          <div className="bg-success/10 border border-success/30 rounded-lg p-6 text-center">
+            <CheckCircle size={48} className="mx-auto mb-4 text-success" />
+            <h3 className="text-lg font-bold mb-2">Request Submitted Successfully!</h3>
+            <p className="mb-6 text-base-content/80">
+              Thank you for reaching out. Our support team will get back to you within 24 hours.
+            </p>
+            <button 
+              className="btn btn-outline btn-success"
+              onClick={() => setFormSubmitted(false)}
+            >
+              Send Another Request
+            </button>
           </div>
-          
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Email Address</span>
-            </label>
-            <input type="email" placeholder="Enter your email" className="input input-bordered w-full" />
+        ) : (
+          <div className="bg-base-200/50 rounded-lg p-6">
+            {formError && (
+              <div className="alert alert-error mb-6">
+                <span>{formError}</span>
+              </div>
+            )}
+            
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-medium">Your Name</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    name="name"
+                    placeholder="Enter your name" 
+                    className="input input-bordered w-full" 
+                    value={formData.name}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-medium">Email Address</span>
+                  </label>
+                  <input 
+                    type="email" 
+                    name="email"
+                    placeholder="Enter your email" 
+                    className="input input-bordered w-full" 
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="form-control md:col-span-2">
+                  <label className="label">
+                    <span className="label-text font-medium">What can we help you with?</span>
+                  </label>
+                  <select 
+                    className="select select-bordered w-full"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleInputChange}
+                  >
+                    <option value="" disabled>Select a topic</option>
+                    <option value="Technical Issue">Technical Issue</option>
+                    <option value="Billing Question">Billing Question</option>
+                    <option value="Course Content">Course Content</option>
+                    <option value="Account Access">Account Access</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                
+                <div className="form-control md:col-span-2">
+                  <label className="label">
+                    <span className="label-text font-medium">Your Message</span>
+                  </label>
+                  <textarea 
+                    className="textarea textarea-bordered h-32" 
+                    placeholder="Please describe your issue in detail..."
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                  ></textarea>
+                </div>
+              </div>
+              
+              <div className="mt-6 flex justify-end">
+                <button type="submit" className="btn btn-primary">
+                  <Send size={16} />
+                  Submit Request
+                </button>
+              </div>
+            </form>
           </div>
-          
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Subject</span>
-            </label>
-            <select className="select select-bordered w-full">
-              <option disabled selected>Select a topic</option>
-              <option>Technical Issue</option>
-              <option>Billing Question</option>
-              <option>Course Content</option>
-              <option>Account Access</option>
-              <option>Other</option>
-            </select>
-          </div>
-          
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Message</span>
-            </label>
-            <textarea className="textarea textarea-bordered h-32" placeholder="Describe your issue in detail"></textarea>
-          </div>
-          
-          <button type="submit" className="btn btn-primary">Submit Request</button>
-        </form>
+        )}
       </div>
     </div>
   );

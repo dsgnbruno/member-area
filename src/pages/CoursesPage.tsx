@@ -17,6 +17,12 @@ const CoursesPage: React.FC = () => {
     const matchesCategory = selectedCategory === '' || course.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Handle search submission
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Search is already handled by the filter function above
+  };
   
   return (
     <div className="container mx-auto px-4 py-6">
@@ -28,25 +34,30 @@ const CoursesPage: React.FC = () => {
       {/* Search and Filter */}
       <div className="bg-base-100 rounded-box p-6 shadow-lg mb-8">
         <div className="flex flex-col md:flex-row gap-4">
-          <div className="form-control flex-1">
-            <div className="input-group">
+          {/* Improved search form with proper button styling */}
+          <form onSubmit={handleSearch} className="flex-1 flex">
+            <div className="relative flex-1">
               <input 
                 type="text" 
                 placeholder="Search courses..." 
-                className="input input-bordered w-full" 
+                className="input input-bordered w-full pr-10" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <button className="btn btn-primary">
-                <Search size={20} />
+              <button 
+                type="submit" 
+                className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-sm btn-circle"
+              >
+                <Search size={18} />
               </button>
             </div>
-          </div>
+          </form>
           
+          {/* Improved filter with integrated button */}
           <div className="form-control md:w-64">
-            <div className="input-group">
+            <div className="relative">
               <select 
-                className="select select-bordered w-full"
+                className="select select-bordered w-full appearance-none pr-10"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
@@ -55,9 +66,9 @@ const CoursesPage: React.FC = () => {
                   <option key={category} value={category}>{category}</option>
                 ))}
               </select>
-              <button className="btn btn-primary">
-                <Filter size={20} />
-              </button>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-base-content/70">
+                <Filter size={16} />
+              </div>
             </div>
           </div>
         </div>

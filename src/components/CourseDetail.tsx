@@ -418,7 +418,7 @@ const CourseDetail: React.FC = () => {
             )}
             
             {/* CTA Button */}
-            <button className="btn btn-primary w-full gap-2 whitespace-nowrap">
+            <Link to={`/classroom/${courseId}`} className="btn btn-primary w-full gap-2 whitespace-nowrap">
               {isNewCourse ? (
                 <>
                   <Play size={16} />
@@ -435,7 +435,7 @@ const CourseDetail: React.FC = () => {
                   Review Course
                 </>
               )}
-            </button>
+            </Link>
           </div>
           
           {/* Course Details Card */}

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Menu, Sun, Moon } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Menu, Sun, Moon, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 
 interface HeaderProps {
@@ -8,11 +8,32 @@ interface HeaderProps {
   setSidebarOpen: (open: boolean) => void;
   theme: string;
   setTheme: (theme: string) => void;
+  setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ sidebarOpen, setSidebarOpen, theme, setTheme }) => {
+const Header: React.FC<HeaderProps> = ({ 
+  sidebarOpen, 
+  setSidebarOpen, 
+  theme, 
+  setTheme,
+  setIsAuthenticated
+}) => {
+  const navigate = useNavigate();
+  
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+  
+  const handleLogout = () => {
+    // Clear authentication data
+    localStorage.removeItem('userLoggedIn');
+    sessionStorage.removeItem('userLoggedIn');
+    
+    // Update authentication state
+    setIsAuthenticated(false);
+    
+    // Redirect to login page
+    navigate('/login');
   };
   
   return (
@@ -51,13 +72,18 @@ const Header: React.FC<HeaderProps> = ({ sidebarOpen, setSidebarOpen, theme, set
           </div>
           <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
             <li>
-              <a className="justify-between">
+              <Link to="/settings" className="justify-between">
                 Profile
                 <span className="badge">New</span>
-              </a>
+              </Link>
             </li>
-            <li><a>Settings</a></li>
-            <li><a>Logout</a></li>
+            <li><Link to="/settings">Settings</Link></li>
+            <li>
+              <button onClick={handleLogout} className="text-error">
+                <LogOut size={16} />
+                Logout
+              </button>
+            </li>
           </ul>
         </div>
       </div>
